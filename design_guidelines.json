@@ -1,0 +1,84 @@
+{
+  "theme": {
+    "mode": "light",
+    "primary_background": "#FFFFFF",
+    "secondary_background": "#F0F7FF",
+    "card_background": "#FFFFFF",
+    "card_border": "#B9D9FB",
+    "primary_blue": "#0256B3",
+    "primary_blue_dark": "#013A7B",
+    "primary_blue_hover": "#014492",
+    "accent_blue_light": "#E1EFFE",
+    "text_dark": "#0B192C",
+    "text_muted": "#3A4D62",
+    "success_green": "#037A4B",
+    "success_bg": "#ECFDF5",
+    "error_red": "#C81E1E",
+    "error_bg": "#FDF2F2",
+    "high_contrast_focus": "#FFD700"
+  },
+  "typography": {
+    "font_family_heading": "Segoe UI, -apple-system, BlinkMacSystemFont, sans-serif",
+    "font_family_body": "Segoe UI, -apple-system, BlinkMacSystemFont, sans-serif",
+    "sizes": {
+      "app_title": "text-3xl md:text-4xl font-extrabold tracking-tight",
+      "heading_large": "text-2xl md:text-3xl font-bold",
+      "heading_medium": "text-xl md:text-2xl font-bold",
+      "body_large": "text-lg md:text-xl font-medium",
+      "body_standard": "text-base md:text-lg font-normal",
+      "button_large": "text-xl md:text-2xl font-bold"
+    }
+  },
+  "layout_and_spacing": {
+    "max_container_width": "max-w-4xl mx-auto px-4 py-6 md:py-8",
+    "card_padding": "p-6 md:p-8",
+    "touch_target_min_height": "min-h-[64px]",
+    "button_padding": "py-4 px-6 md:py-5 md:px-8",
+    "grid_gap": "gap-5 md:gap-6",
+    "border_radius": "rounded-2xl"
+  },
+  "accessibility": {
+    "wcag_target": "AAA",
+    "data_testid_required": true,
+    "high_contrast_mode_supported": true,
+    "font_scaler_supported": true,
+    "screen_reader_announcements": true,
+    "minimum_touch_size": "48px x 48px",
+    "focus_ring": "focus:outline-none focus:ring-4 focus:ring-yellow-400 focus:ring-offset-2"
+  },
+  "screens": [
+    "Simple Login Screen",
+    "Accessibility Mode Selection (Voice Only, Text Only, Voice+Text)",
+    "Voice / Text / Combined Interaction Bar",
+    "Main Dashboard with Account Balance and 9 Action Cards",
+    "Send Money Flow (Recipient -> Amount -> Review -> PIN -> Success/Failure)",
+    "Bill Payment Screen",
+    "Mobile Recharge Screen",
+    "Beneficiaries List",
+    "Notifications Center",
+    "Help & Voice Commands Guide"
+  ],
+  "components_structure": {
+    "Header": "App top bar with Large High-Contrast Toggle, Text Resizer (A- / A+), Help button, and Back/Home Navigation.",
+    "ModeSelector": "Three distinct large cards with large icons and descriptions for Voice Only, Text Only, and Voice+Text.",
+    "VoiceBar": "Prominent sticky or centered Voice Assistant box featuring 'Tap to Speak' mic button, pulsating wave indicator, live transcript, and voice feedback playback.",
+    "DashboardGrid": "3x3 responsive grid (or 1-col on mobile) of prominent action cards with high contrast blue borders, bold 32px+ icons, and clear text labels.",
+    "TransactionFlowModal": "Multi-step modal/page with step progress bar (Review -> PIN -> Result), extra large PIN input, and distinct green ✓ success or red ✕ failure state screens."
+  },
+  "instructions_to_main_agent": [
+    "Build a complete, accessible, mobile-first web app prototype in React for VoiceBank.",
+    "Maintain a crisp light blue and white theme (#FFFFFF background, #0256B3 primary blue, #F0F7FF card background).",
+    "Do NOT use complex dark fintech dashboards or heavy gradients. Everything must be high-contrast, clean, and ultra-legible.",
+    "Implement simulated Speech-to-Text and Text-to-Speech using Web Speech API (or simulated fallback) so users can tap 'Speak' or type natural commands like 'Check balance', 'Send 500 to Rahul', 'Pay electricity bill'.",
+    "Provide a global Font Scale controller (Normal, Large, Extra Large) and High Contrast mode toggle in the header.",
+    "Ensure ALL interactive elements (buttons, inputs, cards, tabs, options) have unique, kebab-case data-testid attributes.",
+    "Include full end-to-end flows for Send Money (with PIN verification & Success/Failure simulation), Bill Pay, Recharge, Beneficiaries, Notifications, and Help Guide.",
+    "Keep language simple, reassuring, and direct. Pair every icon with bold text."
+  ],
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": {
+    "Avoid Slop": "Do not create cramped, tiny-font or generic centered templates. Use generous spacing, explicit touch targets, and crisp blue borders.",
+    "Color Usage": "Light blue (#F0F7FF) background tint for cards, solid navy (#0256B3) for primary action buttons, dark charcoal (#0B192C) for text.",
+    "Iconography": "Use Lucide-react icons with strokeWidth={2.5} or 3, size 28-36px minimum. Always pair with text labels.",
+    "Testing": "Add data-testid to every button, input, balance card, modal, PIN key, and navigation item."
+  }
+}

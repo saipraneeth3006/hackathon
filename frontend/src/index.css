@@ -1,0 +1,175 @@
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vb-bg: #ffffff;
+  --vb-surface: #f0f7ff;
+  --vb-surface-2: #e1effe;
+  --vb-border: #b9d9fb;
+  --vb-blue: #0256b3;
+  --vb-blue-dark: #013a7b;
+  --vb-blue-hover: #014492;
+  --vb-text: #0b192c;
+  --vb-muted: #3a4d62;
+  --vb-success: #037a4b;
+  --vb-success-bg: #ecfdf5;
+  --vb-error: #c81e1e;
+  --vb-error-bg: #fdf2f2;
+  --vb-focus: #f59e0b;
+}
+
+html.hc {
+  --vb-bg: #ffffff;
+  --vb-surface: #ffffff;
+  --vb-surface-2: #ffffff;
+  --vb-border: #000000;
+  --vb-blue: #003a7b;
+  --vb-blue-dark: #000000;
+  --vb-blue-hover: #000000;
+  --vb-text: #000000;
+  --vb-muted: #000000;
+  --vb-success: #036b42;
+  --vb-error: #a10d0d;
+  --vb-focus: #b45309;
+}
+
+html.hc .vb-card,
+html.hc .vb-action-card,
+html.hc .vb-input {
+  border-width: 3px !important;
+}
+
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Atkinson Hyperlegible", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  background-color: var(--vb-bg);
+  color: var(--vb-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus states for keyboard accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 4px solid var(--vb-focus);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+@layer components {
+  .vb-page {
+    @apply w-full max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8;
+  }
+
+  .vb-card {
+    background-color: var(--vb-bg);
+    border: 2px solid var(--vb-border);
+    @apply rounded-2xl p-6 md:p-8;
+  }
+
+  .vb-heading {
+    color: var(--vb-text);
+    @apply text-2xl md:text-3xl font-bold leading-tight;
+  }
+
+  .vb-subtext {
+    color: var(--vb-muted);
+    @apply text-lg md:text-xl;
+  }
+
+  .vb-btn {
+    @apply inline-flex items-center justify-center gap-3 w-full min-h-[64px]
+      rounded-2xl px-6 py-4 text-xl md:text-2xl font-bold
+      transition-colors duration-150 cursor-pointer disabled:opacity-50
+      disabled:cursor-not-allowed;
+  }
+
+  .vb-btn-primary {
+    background-color: var(--vb-blue);
+    color: #ffffff;
+  }
+  .vb-btn-primary:hover:not(:disabled) {
+    background-color: var(--vb-blue-hover);
+  }
+
+  .vb-btn-secondary {
+    background-color: var(--vb-bg);
+    color: var(--vb-blue-dark);
+    border: 3px solid var(--vb-blue);
+  }
+  .vb-btn-secondary:hover:not(:disabled) {
+    background-color: var(--vb-surface-2);
+  }
+
+  .vb-btn-danger {
+    background-color: var(--vb-bg);
+    color: var(--vb-error);
+    border: 3px solid var(--vb-error);
+  }
+  .vb-btn-danger:hover:not(:disabled) {
+    background-color: var(--vb-error-bg);
+  }
+
+  .vb-input {
+    background-color: var(--vb-bg);
+    color: var(--vb-text);
+    border: 2px solid var(--vb-border);
+    @apply w-full min-h-[64px] rounded-2xl px-5 py-4 text-xl md:text-2xl
+      font-medium;
+  }
+  .vb-input::placeholder {
+    color: #7a8aa0;
+  }
+  .vb-input:focus {
+    border-color: var(--vb-blue);
+  }
+
+  .vb-action-card {
+    background-color: var(--vb-surface);
+    border: 2px solid var(--vb-border);
+    color: var(--vb-text);
+    @apply flex flex-col items-start gap-3 rounded-2xl p-5 md:p-6
+      text-left transition-all duration-150 cursor-pointer min-h-[128px];
+  }
+  .vb-action-card:hover {
+    background-color: var(--vb-surface-2);
+    border-color: var(--vb-blue);
+  }
+
+  .vb-label {
+    color: var(--vb-text);
+    @apply block text-lg md:text-xl font-bold mb-2;
+  }
+}
+
+@keyframes vb-pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.vb-mic-listening::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: var(--vb-blue);
+  animation: vb-pulse-ring 1.4s ease-out infinite;
+  z-index: -1;
+}

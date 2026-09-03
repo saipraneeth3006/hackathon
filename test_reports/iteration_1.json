@@ -1,0 +1,36 @@
+{
+  "summary": "Full backend + frontend testing of VoiceBank prototype. Backend /api/parse-command validated for all 11 intent types via pytest (12/12 pass). Frontend end-to-end demo flow tested via Playwright: login (wrong+correct pw), mode select, dashboard (balance ₹25,430 + 9 action cards), text-command flows (balance/transactions/beneficiaries/notifications/help/cancel/go back), full Send Money PIN flow (wrong PIN + success + balance decrement to ₹24,930), Insufficient Balance failure path, Bill Payment (electricity) success, Mobile Recharge success, and accessibility (high-contrast toggle). Found and fixed one critical wiring bug in BankContext.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "BankContext value", "issue": "`announce` was defined in provider but NOT exposed via context value; SendMoneyScreen/BillPayScreen/RechargeScreen destructured `announce` from useBank() which returned undefined, causing 'announce is not a function' TypeError on Continue click in direct action-card flows (send-money, pay-bills, recharge). This blocked the entire Insufficient Balance flow and any payment initiated from action cards.", "selector": "send-continue-btn / bill-continue-btn / recharge-continue-btn", "priority": "CRITICAL - FIXED"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/test_parse_command.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Verify the fix to /app/frontend/src/context/BankContext.jsx (added `announce` to exported context value). No further action strictly required."
+  ],
+  "critical_code_review_comments": [
+    "BankContext.jsx exposed `speak/replay` but not `announce`, though downstream screens depended on `announce`. Consider spreading a single memoised object or exhaustive-deps lint to catch such misses.",
+    "Backend uses model id 'gpt-5.4-mini' — works via emergent LLM proxy today, but hardcoded model string is fragile; consider env var.",
+    "commandParser.js falls back to localParse only when server returns action==='unknown'. If server returns a wrong action (e.g. LLM misclassifies), local regex fallback is not tried — acceptable for demo.",
+    "No tests folder / no CORS_ORIGINS list issue observed. Everything else clean.",
+    "PIN screen text 'Demo payment PIN: 5678' is visible — intentional for demo but should be gated in production."
+  ],
+  "updated_files": [
+    "/app/frontend/src/context/BankContext.jsx (exposed `announce` in context value)",
+    "/app/backend/tests/test_parse_command.py (new)"
+  ],
+  "success_rate": {"backend": "100% (12/12)", "frontend": "100% after fix (all demo-flow checks pass: login, mode, dashboard, text-commands, send-money w/ wrong+correct PIN, balance decrement, insufficient-balance failure, bill pay, recharge, beneficiaries, notifications, help, go back, cancel, contrast toggle)"},
+  "test_credentials": "App password 1234, Payment PIN 5678 (per problem statement; /app/memory/test_credentials.md not present).",
+  "seed_data_creation": "None. All data is client-side mock (INITIAL_BALANCE ₹25,430, beneficiaries Rahul/Priya/Arun, INITIAL_TRANSACTIONS).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Dashboard action-card testids: action-check-balance, action-transactions, action-send-money, action-pay-bills, action-recharge (NOT action-mobile-recharge), action-beneficiaries, action-notifications, action-settings, action-help. Beneficiary testids use ids b1/b2/b3 not names. Backend model is gpt-5.4-mini via emergent LLM key.",
+  "rca of the issue": "SendMoneyScreen/BillPayScreen/RechargeScreen destructure `announce` from useBank(). BankContext.jsx defined `announce` locally with useCallback but never added it to the `value` object returned in `<BankContext.Provider value={value}>`. Reproduction: login 1234 -> Voice+Text -> click 'Send Money' card -> pick Rahul -> type 500 -> click Continue -> 'announce is not a function' uncaught runtime error (webpack overlay blocks further interaction). Fix: added `announce` to the exposed value object."
+}
