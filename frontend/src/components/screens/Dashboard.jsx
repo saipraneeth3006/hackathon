@@ -10,11 +10,10 @@ import {
   Bell,
   Settings,
   HelpCircle,
-  Eye,
 } from "lucide-react";
 
 export const Dashboard = () => {
-  const { balance, formatMoney, runIntent, navigate } = useBank();
+  const { runIntent, navigate } = useBank();
 
   const actions = [
     { testId: "action-check-balance", Icon: Wallet, label: "Check Balance", onClick: () => runIntent({ action: "check_balance" }) },
@@ -30,27 +29,12 @@ export const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-6" data-testid="dashboard-screen">
-      {/* Balance card */}
-      <div
-        className="rounded-2xl p-6 md:p-8 text-white"
-        style={{ backgroundColor: "var(--vb-blue)" }}
-        data-testid="balance-card"
-      >
-        <p className="text-lg md:text-xl font-medium opacity-90">Welcome back</p>
-        <p className="text-lg md:text-xl font-medium opacity-90 mt-4">Available Balance</p>
-        <p className="text-4xl md:text-5xl font-extrabold mt-1" data-testid="dashboard-balance-amount">
-          {formatMoney(balance)}
+      <div>
+        <p className="text-lg md:text-xl font-medium" style={{ color: "var(--vb-muted)" }}>
+          Welcome back
         </p>
-        <button
-          data-testid="dashboard-view-balance-btn"
-          onClick={() => runIntent({ action: "check_balance" })}
-          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white/15 hover:bg-white/25 px-4 py-3 font-bold text-lg transition-colors min-h-[48px]"
-        >
-          <Eye size={22} strokeWidth={2.5} /> View & hear balance
-        </button>
+        <h2 className="vb-heading mt-1">What would you like to do?</h2>
       </div>
-
-      <h2 className="vb-heading">What would you like to do?</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
         {actions.map(({ testId, Icon, label, onClick }) => (

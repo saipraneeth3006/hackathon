@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useBank } from "../../context/BankContext";
-import { Landmark, Lock, LogIn, AlertCircle } from "lucide-react";
+import { Lock, LogIn, AlertCircle } from "lucide-react";
+import logo from "../../assets/logo.jpeg";
 
 export const LoginScreen = () => {
   const { doLogin } = useBank();
@@ -22,13 +23,13 @@ export const LoginScreen = () => {
     >
       <div className="w-full max-w-md vb-card" data-testid="login-screen">
         <div className="flex flex-col items-center text-center gap-3 mb-8">
-          <div
-            className="flex items-center justify-center w-20 h-20 rounded-2xl"
-            style={{ backgroundColor: "var(--vb-blue)" }}
-          >
-            <Landmark size={44} strokeWidth={2.5} color="#fff" />
-          </div>
-          <h1 className="vb-heading text-3xl md:text-4xl">Welcome to DevoicePay</h1>
+          <img
+            src={logo}
+            alt="DevoicePay logo"
+            className="w-52 md:w-60 h-auto"
+            data-testid="login-logo"
+          />
+          <h1 className="sr-only">Welcome to DevoicePay</h1>
           <p className="vb-subtext">Enter your app password</p>
         </div>
 

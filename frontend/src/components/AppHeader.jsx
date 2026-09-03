@@ -1,13 +1,13 @@
 import React from "react";
 import { useBank } from "../context/BankContext";
 import {
-  Landmark,
   Home,
   ArrowLeft,
   HelpCircle,
   Contrast,
   Type,
 } from "lucide-react";
+import logo from "../assets/logo.jpeg";
 
 const IconBtn = ({ testId, label, onClick, children }) => (
   <button
@@ -48,18 +48,12 @@ export const AppHeader = () => {
     >
       <div className="max-w-4xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
-          <div
-            className="flex items-center justify-center w-11 h-11 rounded-xl"
-            style={{ backgroundColor: "var(--vb-blue)" }}
-          >
-            <Landmark size={26} strokeWidth={2.5} color="#fff" />
-          </div>
-          <span
-            className="text-xl md:text-2xl font-bold"
-            style={{ color: "var(--vb-blue-dark)" }}
-          >
-            DevoicePay
-          </span>
+          <img
+            src={logo}
+            alt="DevoicePay"
+            className="h-11 md:h-12 w-auto"
+            data-testid="app-logo"
+          />
         </div>
 
         {mode && (

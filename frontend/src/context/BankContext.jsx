@@ -37,9 +37,7 @@ function buildScreenSpeech(screen, d) {
   } = d;
   switch (screen) {
     case "dashboard":
-      return `You are on the DevoicePay home screen. Your available balance is ${speakMoney(
-        balance
-      )}. You can say: check my balance, show recent transactions, send money, pay bills, or recharge mobile. Speak or type your command.`;
+      return `You are on the DevoicePay home screen. You can say: check my balance, show recent transactions, send money, pay bills, or recharge mobile. Speak or type your command.`;
     case "balance":
       return `Your available balance is ${speakMoney(balance)}.`;
     case "transactions": {
