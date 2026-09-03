@@ -58,7 +58,7 @@ export const AppHeader = () => {
             className="text-xl md:text-2xl font-bold"
             style={{ color: "var(--vb-blue-dark)" }}
           >
-            VoiceBank
+            DevoicePay
           </span>
         </div>
 

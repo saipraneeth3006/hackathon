@@ -36,7 +36,7 @@ export const ModeSelectScreen = () => {
     >
       <div className="w-full max-w-3xl" data-testid="mode-select-screen">
         <h1 className="vb-heading text-center text-3xl md:text-4xl mb-3">
-          How would you like to use VoiceBank?
+          How would you like to use DevoicePay?
         </h1>
         <p className="vb-subtext text-center mb-8" style={{ color: "var(--vb-muted)" }}>
           Choose the way that is easiest for you. You can change this anytime.

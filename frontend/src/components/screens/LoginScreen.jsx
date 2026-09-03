@@ -28,7 +28,7 @@ export const LoginScreen = () => {
           >
             <Landmark size={44} strokeWidth={2.5} color="#fff" />
           </div>
-          <h1 className="vb-heading text-3xl md:text-4xl">Welcome to VoiceBank</h1>
+          <h1 className="vb-heading text-3xl md:text-4xl">Welcome to DevoicePay</h1>
           <p className="vb-subtext">Enter your app password</p>
         </div>
 

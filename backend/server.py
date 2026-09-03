@@ -36,7 +36,7 @@ VALID_ACTIONS = {
 VALID_BILLS = {"electricity", "water", "internet", "mobile", "other"}
 
 SYSTEM_PROMPT = (
-    "You are the command understanding engine for a simulated banking app called VoiceBank. "
+    "You are the command understanding engine for a simulated banking app called DevoicePay. "
     "Convert the user's request (voice or typed) into a single JSON intent object. "
     "Respond with ONLY the JSON object. No markdown, no code fences, no explanation.\n\n"
     "Schema: {\"action\": string, \"amount\": number|null, \"recipient\": string|null, \"bill_type\": string|null}\n"
@@ -99,7 +99,7 @@ def _sanitize(data: dict) -> CommandIntent:
 
 @api_router.get("/")
 async def root():
-    return {"message": "VoiceBank API running"}
+    return {"message": "DevoicePay API running"}
 
 
 @api_router.post("/parse-command", response_model=CommandIntent)

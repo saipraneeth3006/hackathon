@@ -23,6 +23,82 @@ export const useBank = () => useContext(BankContext);
 
 const FONT_SCALES = { normal: "100%", large: "118%", xlarge: "138%" };
 
+// Builds a full spoken description of a screen so voice-mode users hear the
+// whole screen when it opens, not just command responses.
+function buildScreenSpeech(screen, d) {
+  const {
+    balance,
+    transactions = [],
+    beneficiaries = [],
+    notifications = [],
+    pendingPayment: p,
+    paymentResult: r,
+    failure: f,
+  } = d;
+  switch (screen) {
+    case "dashboard":
+      return `You are on the DevoicePay home screen. Your available balance is ${speakMoney(
+        balance
+      )}. You can say: check my balance, show recent transactions, send money, pay bills, or recharge mobile. Speak or type your command.`;
+    case "balance":
+      return `Your available balance is ${speakMoney(balance)}.`;
+    case "transactions": {
+      const lines = transactions
+        .slice(0, 4)
+        .map(
+          (t) =>
+            `${t.description}, ${speakMoney(t.amount)}, ${t.type === "credit" ? "credit" : "debit"}, ${t.status}`
+        )
+        .join(". ");
+      return `Here are your recent transactions. ${lines}.`;
+    }
+    case "beneficiaries":
+      return `Your saved beneficiaries are ${beneficiaries
+        .map((b) => b.name)
+        .join(", ")}. Choose one to send money.`;
+    case "notifications": {
+      const lines = notifications.slice(0, 4).map((n) => n.text).join(" ");
+      return `You have ${notifications.length} notifications. ${lines}`;
+    }
+    case "help":
+      return "Here is what you can say. Check my balance. Show recent transactions. Send five hundred rupees to Rahul. Pay my electricity bill. Recharge my mobile. Say cancel to stop, or go back to return.";
+    case "settings":
+      return "Settings. Here you can change the text size, turn on high contrast, or log out.";
+    case "send-money":
+      return "Send money. Please choose who to send to, and enter the amount.";
+    case "bill-pay":
+      return "Pay bills. Please choose which bill you want to pay.";
+    case "recharge":
+      return "Mobile recharge. Please enter the mobile number and choose a recharge plan.";
+    case "review": {
+      if (!p) return "Review payment.";
+      const s =
+        p.type === "transfer"
+          ? `You are about to send ${speakMoney(p.amount)} to ${p.recipient}.`
+          : p.type === "bill"
+          ? `You are about to pay ${speakMoney(p.amount)} for your ${p.label} bill.`
+          : `You are about to recharge ${p.number} with ${speakMoney(p.amount)}.`;
+      return `Review payment. ${s} Tap confirm to continue, or cancel to stop. This will need your payment PIN.`;
+    }
+    case "pin":
+      return "Please enter your four digit payment PIN, then tap Pay Now.";
+    case "success": {
+      if (!r) return "Payment successful.";
+      const verb =
+        r.type === "transfer"
+          ? "sent successfully"
+          : r.type === "bill"
+          ? "paid successfully"
+          : "recharge successful";
+      return `Payment successful. ${speakMoney(r.amount)} ${verb}. Transaction I D ${r.txnId}. You can tap Done to return home.`;
+    }
+    case "failure":
+      return `Payment failed. ${f?.reason || ""}. ${f?.message || ""}`;
+    default:
+      return "";
+  }
+}
+
 export function BankProvider({ children }) {
   const speech = useSpeech();
 
@@ -65,13 +141,28 @@ export function BankProvider({ children }) {
 
   const { speak, cancelSpeak } = speech;
 
-  const announce = useCallback(
-    (text) => {
-      setLastResponse(text);
-      if (modeRef.current !== "text") speak(text);
-    },
-    [speak]
-  );
+  const announce = useCallback((text) => {
+    // Display-only. Speaking is handled by the per-screen auto-read below so
+    // voice users hear the full screen, not just short confirmations.
+    setLastResponse(text);
+  }, []);
+
+  // Auto-read the whole screen aloud when it opens, in voice modes only.
+  useEffect(() => {
+    if (!authed) return;
+    if (mode !== "voice" && mode !== "voice-text") return;
+    const text = buildScreenSpeech(screen, {
+      balance,
+      transactions,
+      beneficiaries,
+      notifications,
+      pendingPayment,
+      paymentResult,
+      failure,
+    });
+    if (text) speak(text);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, mode, authed]);
 
   const replay = useCallback(() => {
     if (lastResponse) speak(lastResponse);
@@ -177,11 +268,14 @@ export function BankProvider({ children }) {
         case "logout":
           logout();
           break;
-        default:
-          announce("I didn't understand that. Please try again.");
+        default: {
+          const msg = "I didn't understand that. Please try again.";
+          announce(msg);
+          if (modeRef.current !== "text") speak(msg);
+        }
       }
     },
-    [announce, navigate, goBack, resetToDashboard, logout]
+    [announce, navigate, goBack, resetToDashboard, logout, speak]
   );
 
   const handleCommand = useCallback(
