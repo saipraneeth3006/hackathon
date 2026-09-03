@@ -18,6 +18,7 @@ import {
   RechargeScreen,
   ReviewScreen,
   PinScreen,
+  ProcessingScreen,
   SuccessScreen,
   FailureScreen,
   UnlockScreen,
@@ -37,12 +38,13 @@ const SCREENS = {
   review: ReviewScreen,
   pin: PinScreen,
   unlock: UnlockScreen,
+  processing: ProcessingScreen,
   success: SuccessScreen,
   failure: FailureScreen,
 };
 
 // Command bar is hidden on focused / secure screens.
-const HIDE_COMMAND_BAR = new Set(["pin", "unlock", "success", "failure", "review"]);
+const HIDE_COMMAND_BAR = new Set(["pin", "unlock", "processing", "success", "failure", "review"]);
 
 // Small side "mute / stop" button: instantly stops any voice output and
 // voice listening. Shown only in voice and voice+text modes.

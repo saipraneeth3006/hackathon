@@ -82,6 +82,8 @@ function buildScreenSpeech(screen, d) {
       return "Please enter your four digit payment PIN, then tap Pay Now.";
     case "unlock":
       return "For your security, please enter your payment PIN to continue.";
+    case "processing":
+      return "Your payment is being processed. Please wait.";
     case "success": {
       if (!r) return "Payment successful.";
       const verb =
@@ -415,7 +417,7 @@ export function BankProvider({ children }) {
       setNotifications((list) => [{ id: txnId, text: notifText, time: dt }, ...list]);
 
       setPaymentResult({ type: p.type, amount: amt, txnId, datetime: dt, toLine, status });
-      navigate("success");
+      navigate("processing");
       announce(spoken);
       return { ok: true };
     },

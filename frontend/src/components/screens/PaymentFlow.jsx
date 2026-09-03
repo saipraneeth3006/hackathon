@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useBank } from "../../context/BankContext";
 import { BILL_CATEGORIES, RECHARGE_PLANS } from "../../lib/mockData";
 import {
@@ -443,6 +443,46 @@ export const PinScreen = () => {
   );
 };
 
+/* ---------------- Processing (animated, before success) ---------------- */
+export const ProcessingScreen = () => {
+  const { navigate } = useBank();
+
+  useEffect(() => {
+    const t = setTimeout(() => navigate("success"), 2100);
+    return () => clearTimeout(t);
+  }, [navigate]);
+
+  return (
+    <div
+      className="vb-card flex flex-col items-center text-center gap-6 max-w-md mx-auto w-full py-12"
+      data-testid="processing-screen"
+      role="status"
+      aria-live="assertive"
+      aria-label="Processing payment. Please wait."
+    >
+      <div className="relative flex items-center justify-center w-32 h-32">
+        <span
+          className="absolute w-24 h-24 rounded-full vb-ripple"
+          style={{ backgroundColor: "var(--vb-surface-2)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="vb-spinner w-24 h-24"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="vb-soft-pulse">
+        <h2 className="vb-heading" style={{ color: "var(--vb-blue-dark)" }}>
+          Processing Payment...
+        </h2>
+        <p className="vb-subtext mt-2" style={{ color: "var(--vb-muted)" }}>
+          Please wait while we securely process your payment.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 /* ---------------- Success ---------------- */
 export const SuccessScreen = () => {
   const { paymentResult: r, resetToDashboard, navigate, replay, formatMoney } = useBank();
@@ -456,34 +496,64 @@ export const SuccessScreen = () => {
   };
 
   return (
-    <div className="vb-card flex flex-col items-center text-center gap-5 max-w-md mx-auto w-full" data-testid="success-screen">
-      <div
-        className="flex items-center justify-center w-24 h-24 rounded-full"
-        style={{ backgroundColor: "var(--vb-success-bg)" }}
-      >
-        <CheckCircle2 size={72} strokeWidth={2.5} style={{ color: "var(--vb-success)" }} />
+    <div
+      className="vb-card flex flex-col items-center text-center gap-5 max-w-md mx-auto w-full"
+      data-testid="success-screen"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="relative flex items-center justify-center w-28 h-28">
+        <span
+          className="absolute w-24 h-24 rounded-full vb-ripple"
+          style={{ backgroundColor: "var(--vb-success-bg)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="vb-check-pop flex items-center justify-center w-24 h-24 rounded-full"
+          style={{ backgroundColor: "var(--vb-success-bg)" }}
+        >
+          <CheckCircle2 size={72} strokeWidth={2.5} style={{ color: "var(--vb-success)" }} />
+        </div>
       </div>
-      <h2 className="vb-heading" style={{ color: "var(--vb-success)" }}>Payment Successful</h2>
-      <p className="text-2xl font-extrabold" data-testid="success-amount">
+      <h2
+        className="vb-heading vb-reveal"
+        style={{ color: "var(--vb-success)", animationDelay: "0.15s" }}
+      >
+        Payment Successful
+      </h2>
+      <p
+        className="text-2xl font-extrabold vb-reveal"
+        data-testid="success-amount"
+        style={{ animationDelay: "0.3s" }}
+      >
         {formatMoney(r.amount)} {verb}
       </p>
 
       <div className="w-full flex flex-col gap-3 mt-2">
-        <div className="flex items-center justify-between rounded-2xl p-4 border-2" style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)" }}>
+        <div
+          className="flex items-center justify-between rounded-2xl p-4 border-2 vb-reveal"
+          style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)", animationDelay: "0.45s" }}
+        >
           <span className="font-bold" style={{ color: "var(--vb-muted)" }}>{r.toLine.split(":")[0] || "Details"}</span>
           <span className="text-lg font-bold text-right">{r.toLine.includes(":") ? r.toLine.split(":").slice(1).join(":").trim() : r.toLine}</span>
         </div>
-        <div className="flex items-center justify-between rounded-2xl p-4 border-2" style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)" }}>
+        <div
+          className="flex items-center justify-between rounded-2xl p-4 border-2 vb-reveal"
+          style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)", animationDelay: "0.6s" }}
+        >
           <span className="font-bold" style={{ color: "var(--vb-muted)" }}>Transaction ID</span>
           <span className="text-lg font-bold" data-testid="success-txn-id">{r.txnId}</span>
         </div>
-        <div className="flex items-center justify-between rounded-2xl p-4 border-2" style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)" }}>
+        <div
+          className="flex items-center justify-between rounded-2xl p-4 border-2 vb-reveal"
+          style={{ borderColor: "var(--vb-border)", backgroundColor: "var(--vb-surface)", animationDelay: "0.75s" }}
+        >
           <span className="font-bold" style={{ color: "var(--vb-muted)" }}>Date & Time</span>
           <span className="text-lg font-bold text-right">{r.datetime}</span>
         </div>
       </div>
 
-      <div className="w-full flex flex-col gap-3 mt-2">
+      <div className="w-full flex flex-col gap-3 mt-2 vb-reveal" style={{ animationDelay: "0.9s" }}>
         <button className="vb-btn vb-btn-primary" onClick={resetToDashboard} data-testid="success-done-btn">
           <Home size={26} strokeWidth={2.5} /> Done
         </button>
