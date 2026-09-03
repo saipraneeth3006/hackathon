@@ -9,6 +9,12 @@ import React, {
 import { useSpeech } from "../hooks/useSpeech";
 import { parseCommand } from "../lib/commandParser";
 import {
+  hasForeignCurrency,
+  looksLikePayment,
+  validateSendMoney,
+  PAYMENT_MESSAGES,
+} from "../lib/paymentValidation";
+import {
   DEMO_APP_PASSWORD,
   DEMO_PAYMENT_PIN,
   INITIAL_BALANCE,
@@ -122,6 +128,7 @@ export function BankProvider({ children }) {
 
   const [recognizedText, setRecognizedText] = useState("");
   const [lastResponse, setLastResponse] = useState("");
+  const [commandError, setCommandError] = useState("");
   const [processing, setProcessing] = useState(false);
 
   const screen = screenStack[screenStack.length - 1];
@@ -344,19 +351,63 @@ export function BankProvider({ children }) {
   );
 
   const handleCommand = useCallback(
-    async (raw) => {
+    async (raw, source = "text") => {
       const text = (raw || "").trim();
-      if (!text) return;
+      const voice = modeRef.current !== "text";
+
+      // Show a validation error: visible on screen and spoken in voice modes.
+      const showError = (msg) => {
+        setCommandError(msg);
+        setLastResponse(msg);
+        if (voice) speak(msg);
+      };
+
+      // 5. Empty input
+      if (!text) {
+        showError(PAYMENT_MESSAGES.empty);
+        return;
+      }
+
+      setCommandError("");
       setRecognizedText(text);
+
+      // 3. Reject foreign currencies (only Indian Rupees allowed)
+      if (hasForeignCurrency(text)) {
+        showError(PAYMENT_MESSAGES.currency);
+        return;
+      }
+
       setProcessing(true);
+      let intent;
       try {
-        const intent = await parseCommand(text);
-        runIntent(intent);
+        intent = await parseCommand(text);
       } finally {
         setProcessing(false);
       }
+
+      // 2 + 4 + 6. Strict Send Money validation
+      if (intent.action === "send_money") {
+        const v = validateSendMoney(text);
+        if (!v.ok) {
+          showError(source === "voice" ? PAYMENT_MESSAGES.voice : PAYMENT_MESSAGES.format);
+          return;
+        }
+        // 7. Normalize + display the recognized command before continuing
+        setRecognizedText(`Send ₹${v.amount} to ${v.recipient}`);
+        runIntent({ action: "send_money", amount: v.amount, recipient: v.recipient });
+        return;
+      }
+
+      // If it looked like a payment attempt but we can't understand it,
+      // show the payment correction message (never proceed to PIN).
+      if (intent.action === "unknown" && looksLikePayment(text)) {
+        showError(source === "voice" ? PAYMENT_MESSAGES.voice : PAYMENT_MESSAGES.format);
+        return;
+      }
+
+      runIntent(intent);
     },
-    [runIntent]
+    [runIntent, speak]
   );
 
   // ---- Payment execution ----
@@ -468,6 +519,8 @@ export function BankProvider({ children }) {
     recognizedText,
     setRecognizedText,
     lastResponse,
+    commandError,
+    setCommandError,
     processing,
     runIntent,
     handleCommand,
