@@ -1,0 +1,29 @@
+{
+  "summary": "Frontend-only regression for the newly added payment-PIN unlock gate. All dashboard action cards correctly show the Unlock screen before opening any feature. Wrong PIN shows inline error and keeps user on the unlock screen; correct PIN 5678 opens the intended feature. Cancel returns to dashboard. Regression: full Send Money success flow (Rahul, ₹500) works and balance reduces from ₹25,430.00 to ₹24,930.00; insufficient balance path (₹999999) shows the Insufficient Balance failure screen. Typed commands ('check my balance') in Voice+Text mode are correctly gated by the unlock screen. Navigation commands ('go back', 'cancel') bypass the gate as expected.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Dashboard (Text-Only mode)", "issues": ["In Text-Only mode there is no CommandBar or persistent Back button on inner screens (e.g. balance-screen). Users using text-only mode have no obvious way to return to the dashboard from an info screen except by relying on browser history. Consider adding a header Back/Home button visible on all inner screens for all modes."]}
+    ]
+  },
+  "test_report_links": [],
+  "action_items": [
+    "Optional: expose a visible Back/Home control on inner screens in Text-Only mode (currently only voice-text/voice modes get the CommandBar which provides 'go back'/'cancel')."
+  ],
+  "critical_code_review_comments": [
+    "BankContext.runIntent: no handler for `logout` produces a default 'I didn't understand' message when default hits, but logout case exists. OK.",
+    "UnlockScreen doesn't clear pendingIntent on Cancel (goBack). If the user cancels unlock and later runs another gated intent, pendingIntent from the cancelled one is still set until requestUnlock overwrites it. Minor - overwritten on next requestUnlock so no observable bug, but consider clearing it in Cancel handler for cleanliness.",
+    "GATED_ACTIONS + submitUnlock uses goBack() to pop the unlock screen; relies on unlock being the top of stack. If any intermediate screen ever pushes on top of unlock, this could break. Safe for current flows.",
+    "buildScreenSpeech reads pendingPayment/paymentResult from state, not refs - fine for effects since they trigger re-render."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (not tested per request)", "frontend": "100% (all functional assertions passed)"},
+  "test_credentials": "App password: 1234, Payment PIN: 5678",
+  "seed_data_creation": "None (client-side mock data)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Payment-PIN unlock gate verified end-to-end via Playwright against REACT_APP_BACKEND_URL. All 9 action cards gate correctly. Wrong/Correct PIN paths work. Send-Money success + Insufficient balance regressions pass. Typed commands in Voice+Text mode go through the gate; go_back/cancel intents do not. Note: use Voice+Text mode when scripting typed-command tests because Text-Only mode does not show the CommandBar on inner screens. Balance testid is `balance-amount` (not `dashboard-balance-amount`; balance card has been removed from Dashboard as intended).",
+  "rca of the issue": "N/A - no functional issues found."
+}

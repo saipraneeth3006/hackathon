@@ -80,6 +80,8 @@ function buildScreenSpeech(screen, d) {
     }
     case "pin":
       return "Please enter your four digit payment PIN, then tap Pay Now.";
+    case "unlock":
+      return "For your security, please enter your payment PIN to continue.";
     case "success": {
       if (!r) return "Payment successful.";
       const verb =
@@ -112,6 +114,7 @@ export function BankProvider({ children }) {
 
   const [screenStack, setScreenStack] = useState(["dashboard"]);
   const [pendingPayment, setPendingPayment] = useState(null);
+  const [pendingIntent, setPendingIntent] = useState(null);
   const [paymentResult, setPaymentResult] = useState(null);
   const [failure, setFailure] = useState(null);
 
@@ -125,9 +128,11 @@ export function BankProvider({ children }) {
   const modeRef = useRef(mode);
   const balanceRef = useRef(balance);
   const pendingRef = useRef(pendingPayment);
+  const pendingIntentRef = useRef(pendingIntent);
   useEffect(() => { modeRef.current = mode; }, [mode]);
   useEffect(() => { balanceRef.current = balance; }, [balance]);
   useEffect(() => { pendingRef.current = pendingPayment; }, [pendingPayment]);
+  useEffect(() => { pendingIntentRef.current = pendingIntent; }, [pendingIntent]);
 
   // Apply font scale + high contrast to the document root.
   useEffect(() => {
@@ -195,6 +200,15 @@ export function BankProvider({ children }) {
     setMode(m);
     setScreenStack(["dashboard"]);
   }, []);
+  const changeMode = useCallback(() => {
+    cancelSpeak();
+    setMode(null);
+    setScreenStack(["dashboard"]);
+    setPendingPayment(null);
+    setPendingIntent(null);
+    setRecognizedText("");
+    setLastResponse("");
+  }, [cancelSpeak]);
   const logout = useCallback(() => {
     cancelSpeak();
     setAuthed(false);
@@ -206,9 +220,41 @@ export function BankProvider({ children }) {
   }, [cancelSpeak]);
 
   // ---- Command routing ----
-  const runIntent = useCallback(
+  // Every feature/option must be unlocked with the payment PIN before it opens.
+  const GATED_ACTIONS = React.useMemo(
+    () =>
+      new Set([
+        "check_balance",
+        "recent_transactions",
+        "send_money",
+        "pay_bill",
+        "mobile_recharge",
+        "show_beneficiaries",
+        "show_notifications",
+        "settings",
+        "help",
+      ]),
+    []
+  );
+
+  const requestUnlock = useCallback(
     (intent) => {
+      setPendingIntent(intent);
+      navigate("unlock");
+      announce("Please enter your payment PIN to continue.");
+    },
+    [navigate, announce]
+  );
+
+  const runIntent = useCallback(
+    (intent, opts = {}) => {
       const action = intent?.action || "unknown";
+
+      if (GATED_ACTIONS.has(action) && !opts.unlocked) {
+        requestUnlock(intent);
+        return;
+      }
+
       switch (action) {
         case "check_balance":
           navigate("balance");
@@ -252,6 +298,10 @@ export function BankProvider({ children }) {
           navigate("notifications");
           announce("Here are your notifications.");
           break;
+        case "settings":
+          navigate("settings");
+          announce("Here are your settings.");
+          break;
         case "go_back":
           goBack();
           break;
@@ -273,7 +323,22 @@ export function BankProvider({ children }) {
         }
       }
     },
-    [announce, navigate, goBack, resetToDashboard, logout, speak]
+    [GATED_ACTIONS, requestUnlock, announce, navigate, goBack, resetToDashboard, logout, speak]
+  );
+
+  // Called by the unlock PIN screen after a correct payment PIN.
+  const submitUnlock = useCallback(
+    (pin) => {
+      if (pin !== DEMO_PAYMENT_PIN) {
+        return { ok: false, error: "Incorrect payment PIN. Please try again." };
+      }
+      const intent = pendingIntentRef.current;
+      setPendingIntent(null);
+      goBack(); // remove the unlock screen from the stack
+      if (intent) runIntent(intent, { unlocked: true });
+      return { ok: true };
+    },
+    [goBack, runIntent]
   );
 
   const handleCommand = useCallback(
@@ -369,6 +434,7 @@ export function BankProvider({ children }) {
     doLogin,
     login,
     chooseMode,
+    changeMode,
     logout,
     // a11y prefs
     fontScale,
@@ -395,6 +461,7 @@ export function BankProvider({ children }) {
     failure,
     setFailure,
     verifyPin,
+    submitUnlock,
     // commands
     recognizedText,
     setRecognizedText,

@@ -6,6 +6,7 @@ import {
   HelpCircle,
   Contrast,
   Type,
+  MessagesSquare,
 } from "lucide-react";
 import logo from "../assets/logo.jpeg";
 
@@ -29,6 +30,7 @@ export const AppHeader = () => {
     goBack,
     resetToDashboard,
     navigate,
+    changeMode,
     highContrast,
     setHighContrast,
     fontScale,
@@ -67,6 +69,14 @@ export const AppHeader = () => {
             <IconBtn testId="header-home-btn" label="Go to home" onClick={resetToDashboard}>
               <Home size={22} strokeWidth={2.5} />
               <span className="hidden sm:inline">Home</span>
+            </IconBtn>
+            <IconBtn
+              testId="header-change-mode-btn"
+              label="Change how you use the app: Voice or Text"
+              onClick={changeMode}
+            >
+              <MessagesSquare size={22} strokeWidth={2.5} />
+              <span className="hidden sm:inline">Voice/Text</span>
             </IconBtn>
             <IconBtn
               testId="header-help-btn"

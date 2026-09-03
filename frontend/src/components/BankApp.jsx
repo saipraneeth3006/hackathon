@@ -19,6 +19,7 @@ import {
   PinScreen,
   SuccessScreen,
   FailureScreen,
+  UnlockScreen,
 } from "./screens/PaymentFlow";
 
 const SCREENS = {
@@ -34,12 +35,13 @@ const SCREENS = {
   recharge: RechargeScreen,
   review: ReviewScreen,
   pin: PinScreen,
+  unlock: UnlockScreen,
   success: SuccessScreen,
   failure: FailureScreen,
 };
 
 // Command bar is hidden on focused / secure screens.
-const HIDE_COMMAND_BAR = new Set(["pin", "success", "failure", "review"]);
+const HIDE_COMMAND_BAR = new Set(["pin", "unlock", "success", "failure", "review"]);
 
 export const BankApp = () => {
   const { screen } = useBank();

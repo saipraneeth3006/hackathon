@@ -15,6 +15,73 @@ import {
   Receipt,
 } from "lucide-react";
 
+/* ---------------- Unlock (PIN gate for opening any option) ---------------- */
+export const UnlockScreen = () => {
+  const { submitUnlock, goBack } = useBank();
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const res = submitUnlock(pin);
+    if (!res.ok) {
+      setError(res.error);
+      setPin("");
+    }
+  };
+
+  return (
+    <div className="vb-card flex flex-col gap-6 max-w-md mx-auto w-full" data-testid="unlock-screen">
+      <div className="flex items-center gap-3">
+        <ShieldCheck size={30} strokeWidth={2.5} style={{ color: "var(--vb-blue)" }} />
+        <h2 className="vb-heading">Enter your payment PIN</h2>
+      </div>
+      <p className="vb-subtext" style={{ color: "var(--vb-muted)" }}>
+        For your security, please enter your payment PIN to continue.
+      </p>
+
+      <form onSubmit={onSubmit} className="flex flex-col gap-5">
+        <input
+          data-testid="unlock-pin-input"
+          type="password"
+          inputMode="numeric"
+          maxLength={4}
+          className="vb-input text-center tracking-[0.5em] text-3xl"
+          placeholder="••••"
+          value={pin}
+          onChange={(e) => {
+            setPin(e.target.value.replace(/\D/g, ""));
+            setError("");
+          }}
+          autoFocus
+        />
+
+        {error && (
+          <div
+            className="flex items-center gap-3 rounded-2xl p-4 border-2"
+            style={{ borderColor: "var(--vb-error)", backgroundColor: "var(--vb-error-bg)" }}
+            data-testid="unlock-error"
+            role="alert"
+          >
+            <XCircle size={26} strokeWidth={2.5} style={{ color: "var(--vb-error)" }} />
+            <p className="vb-subtext font-bold" style={{ color: "var(--vb-error)" }}>{error}</p>
+          </div>
+        )}
+
+        <button type="submit" className="vb-btn vb-btn-primary" disabled={pin.length < 4} data-testid="unlock-continue-btn">
+          Continue
+        </button>
+        <button type="button" className="vb-btn vb-btn-secondary" onClick={goBack} data-testid="unlock-cancel-btn">
+          Cancel
+        </button>
+        <p className="text-center text-base" style={{ color: "var(--vb-muted)" }}>
+          Demo payment PIN: <span className="font-bold">5678</span>
+        </p>
+      </form>
+    </div>
+  );
+};
+
 /* ---------------- Send Money ---------------- */
 export const SendMoneyScreen = () => {
   const { beneficiaries, pendingPayment, setPendingPayment, navigate, announce, formatMoney } = useBank();

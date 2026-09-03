@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export const Dashboard = () => {
-  const { runIntent, navigate } = useBank();
+  const { runIntent } = useBank();
 
   const actions = [
     { testId: "action-check-balance", Icon: Wallet, label: "Check Balance", onClick: () => runIntent({ action: "check_balance" }) },
@@ -23,7 +23,7 @@ export const Dashboard = () => {
     { testId: "action-recharge", Icon: Smartphone, label: "Mobile Recharge", onClick: () => runIntent({ action: "mobile_recharge" }) },
     { testId: "action-beneficiaries", Icon: Users, label: "Beneficiaries", onClick: () => runIntent({ action: "show_beneficiaries" }) },
     { testId: "action-notifications", Icon: Bell, label: "Notifications", onClick: () => runIntent({ action: "show_notifications" }) },
-    { testId: "action-settings", Icon: Settings, label: "Settings", onClick: () => navigate("settings") },
+    { testId: "action-settings", Icon: Settings, label: "Settings", onClick: () => runIntent({ action: "settings" }) },
     { testId: "action-help", Icon: HelpCircle, label: "Help", onClick: () => runIntent({ action: "help" }) },
   ];
 
